@@ -6,6 +6,7 @@ django-extensions
 django-grappelli
 djangorestframework
 djangorestframework-gis
+django-filter
 django-postgres-copy
 celery[redis]
 flower

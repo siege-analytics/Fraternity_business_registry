@@ -1,3 +1,64 @@
+# Fraternity-Owned Business Registry
+
+A GeoDjango application for cataloging businesses owned or operated by
+fraternity/sorority members, local chapters, or national organizations, with
+full spatial support for "find nearby" queries, census-unit assignment, and
+mapping. Built on the GeoDjango Simple Template (see below).
+
+## What's in this project
+
+The `businesses` Django app models:
+
+- **Council** — governing bodies such as NIC, NPC, NPHC, NALFO, NAPA, NMGC, PFA.
+- **Fraternity** — a Greek-letter organization (social, professional, honor,
+  service, religious, multicultural, etc.), with council affiliation, founding
+  info, and an optional headquarters address.
+- **Chapter** — a local chapter of a fraternity, tied to an institution or
+  alumni city, with status, charter year, optional address, and a point
+  geometry for the chapter house.
+- **BusinessCategory** — a hierarchical taxonomy of business types.
+- **Business** — a business owned/controlled by a fraternity, chapter, or
+  member. Has a point geometry, address, category, operating status,
+  verification flag, and contact info.
+- **BusinessOwnership** — a join row connecting a business to one or more
+  owning fraternities / chapters / named members, with role (founder, owner,
+  co-owner, investor, operator) and optional ownership percentage.
+
+Addresses reuse `locations.United_States_Address` so businesses and chapters
+inherit the template's built-in geocoding and census-unit assignment.
+
+### REST API
+
+Once the stack is up (see Quick Start below):
+
+```
+GET  /businesses/councils/
+GET  /businesses/fraternities/?fraternity_type=social_fraternity&council=1
+GET  /businesses/chapters/?fraternity=3&status=active
+GET  /businesses/categories/
+GET  /businesses/businesses/?ownership_class=chapter&verified=true
+GET  /businesses/businesses/nearby/?lat=37.77&lon=-122.41&radius_km=10
+GET  /businesses/ownerships/?fraternity=3
+```
+
+All list endpoints that include a geometry return GeoJSON
+`FeatureCollection`s (via `GeoFeatureModelSerializer`) so they drop straight
+into Leaflet / Mapbox / MapLibre front-ends.
+
+### Getting started with this app
+
+```bash
+make build && make up
+make shell
+python hellodjango/manage.py makemigrations businesses
+python hellodjango/manage.py migrate
+python hellodjango/manage.py createsuperuser
+# then visit http://localhost:8000/admin/ to seed councils, fraternities,
+# chapters, categories, businesses, and ownerships.
+```
+
+---
+
 # GeoDjango Simple Template
 
 A production-ready template for building GeoDjango applications with spatial data support, REST APIs, and real-time capabilities.

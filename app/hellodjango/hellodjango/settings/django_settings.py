@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     "django.contrib.gis",
     "rest_framework",
     'rest_framework_gis',
+    "django_filters",
     "locations",
+    "businesses",
 ]
 
 MIDDLEWARE = [
