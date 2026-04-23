@@ -10,10 +10,20 @@
 ## 1. One-page summary (for the advisory board)
 
 We're building a **registry of businesses owned by Freemasons** — a
-searchable, map-based directory where any Brother can find Masonic-owned
-businesses near them, and any Brother can list his own business. Think
-"Yelp, but the listings are all owned by Brethren, and you have to be a
-verified Brother to see who owns what."
+searchable, map-based directory where any verified Brother can find
+Masonic-owned businesses and list his own. It is **entirely
+authenticated**: an unauthenticated visitor sees a landing page and a
+"Sign in with Amity" button, nothing more. **No business listings, no
+owner names, no Lodge names, no map data** — nothing Masonic — is
+exposed before verified login. A public listing of Masonic-owned
+businesses is itself a security risk to the Craft and its members, and
+we refuse to create one.
+
+**This is a public service, not a business.** The registry is
+underwritten by Siege Analytics and operated at cost. We are not
+seeking profit from it, there is no paid tier, and no revenue share is
+being proposed to anyone, including Amity. The ask here is mission
+alignment, not a commercial deal.
 
 For this to work, we need two things we don't have and that Amity does:
 
@@ -35,6 +45,9 @@ In exchange, Amity gets:
 - Co-branded visibility in front of a very specific, high-intent
   audience: Brethren looking to support Masonic businesses, and Brethren
   business owners looking to be found.
+- A partner whose incentives are aligned with yours by construction:
+  because the registry isn't trying to monetize Brethren, there is no
+  scenario in which our growth goals ever pull against Amity's.
 
 Nothing in the proposal asks Amity to share raw membership data outside
 of what an individual Brother explicitly authorizes about himself, on a
@@ -44,25 +57,42 @@ consent basis, in the standard OAuth model.
 
 ## 2. What we're building
 
-A GeoDjango web application with a public-facing and
-members-only side.
+A GeoDjango web application where **every meaningful surface is behind
+verified-Brother authentication**. There is no public listing side.
 
-### Public side (no login required)
+### Unauthenticated surface (what the world sees)
+- A marketing landing page explaining what the registry is and who
+  it's for.
+- A "Sign in with Amity" button.
+- Nothing else. No search, no map, no business names, no Lodge data,
+  no counts, no teasers.
+
+### Members-only surface (verified Brother, logged in via Amity)
 - Browse a map / search a directory of businesses.
 - See business name, category, address, website, contact info.
-- See whether a business is owned by a **Lodge, Temple Association,
-  Grand Lodge, or other Masonic body** (institutional ownership is
-  public).
+- See owner — whether that's a **Lodge, Temple Association, Grand
+  Lodge, appendant body, or a named Brother**.
 - Filter by category, location, Rite, jurisdiction.
-
-### Members-only side (verified-Brother login required)
-- See **which Brethren** own or co-own which businesses (individual
-  ownership is gated).
 - Verify ownership claims.
 - Submit a new business in ~30 seconds via an Amity-powered
   one-click flow.
 - Claim an existing business listing.
 - Contact a Brother-owner directly through the site.
+
+### Why everything is gated
+
+Publishing a searchable list of Masonic-owned businesses to the open
+internet would create several concrete harms we're unwilling to accept:
+
+- It doxes Lodges and Temple Associations to anyone with ill intent.
+- It doxes individual Brethren who own businesses, even in
+  jurisdictions where Masonic membership is socially or politically
+  risky.
+- It gives hostile actors a convenient target list.
+- It erodes trust with Grand Lodges whose cooperation we want.
+
+The trust model is simple: **you must be a verified Brother to see any
+Brother's business.** Amity is how we enforce that.
 
 ### What's already scaffolded in the repo
 - Django 5 + PostGIS backend with spatial REST APIs.
@@ -231,42 +261,67 @@ the shape we want to grow into.
 
 We take this seriously because the Craft takes it seriously.
 
-- **Default for individual ownership data: members-only.** A non-Mason
-  visiting the site sees "owned by a Brother" but not which Brother.
-  Only a verified, logged-in Brother sees names.
-- **Brother opt-in for individual ownership.** A Brother can list a
-  business with his name attached, or anonymously. His call.
+- **Everything Masonic is behind verified-Brother authentication.**
+  Not just individual-Brother ownership — *all* ownership, including
+  Lodges, Temple Associations, and Grand Lodges. An unauthenticated
+  visitor sees the landing page and nothing else. Publishing a
+  searchable list of Masonic real estate or Masonic-owned businesses
+  to the open internet is a security risk to the Craft, full stop.
+- **Brother opt-in for individual ownership visibility.** Even to
+  other verified Brethren, a Brother can choose to list a business
+  under his name or anonymously ("owned by a Brother in [jurisdiction]").
+  His call.
 - **Amity as source of truth for verification.** We don't try to
-  compete with or shadow your verification.
-- **Revocation respected.** If a Brother disconnects from Amity, he is
-  un-verified on our side within the next sync, his individual
-  ownership rows flip to anonymous, and we delete his Amity-sourced
-  data within 30 days.
-- **Data minimization.** We only store the fields listed in 5.3. We do
-  not fan out Amity data to third parties.
+  compete with or shadow your verification. If Amity says a user is
+  not a verified Brother, they see nothing.
+- **Revocation respected.** If a Brother disconnects from Amity or is
+  marked un-verified on Amity's side, his access flips off on the next
+  trust-sensitive action, his individual ownership rows flip to
+  anonymous, and we delete his Amity-sourced data within 30 days.
+- **Data minimization.** We only store the fields listed in §5.3. We
+  do not fan out Amity data to third parties.
 - **No bulk exports.** There is no endpoint on our side that returns
-  a list of Brethren.
+  a list of Brethren, Lodges, or businesses in a scrapable form.
+- **Per-jurisdiction redaction on request.** If a Grand Lodge asks us
+  to suppress listings in its jurisdiction, we comply immediately
+  while we discuss.
+- **No search-engine indexing.** The authenticated surface is
+  `noindex, nofollow`, excluded from `robots.txt`, and blocked at the
+  CDN from indexable crawlers.
 
 We're open to having these commitments codified in a written data
-handling agreement.
+handling agreement with Amity, and separately with any Grand Lodge
+that wants one.
 
 ---
 
-## 7. Commercial shape (to be discussed)
+## 7. Operating model (not commercial)
 
-Intentionally leaving this thin in a v0 document. Sketches, not
-proposals:
+The registry is a **public service, not a company**. It is underwritten
+by Siege Analytics and operated at cost. Concretely:
 
-- Free tier for Brethren listing their own small business.
-- Paid tier for Lodge-level premium features (e.g. "recommended on
-  Lodge homepage").
-- Revenue share or flat referral fee back to Amity in exchange for the
-  identity layer. We'd want to discuss what maps to your business
-  model.
-- Co-branding: "Verified via Amity" badge on every individual-Brother
-  listing, linking back.
+- **No paid tier, no freemium, no upsell.** Every feature is free for
+  every verified Brother.
+- **No ads. No affiliate links. No sponsored placements.**
+- **No revenue share proposed to Amity.** We are not asking Amity to
+  bless a money-making venture. We are asking Amity to help us run a
+  trust layer for a free service to the Craft.
+- **No sale of data, ever, to anyone, for any price.** Not aggregated,
+  not anonymized, not in the event of an acquisition. Codified in the
+  data handling agreement.
+- **No acquisition exit on the table.** The registry is not a startup
+  with a cap table.
+- **Costs covered by Siege Analytics.** Hosting, storage, bandwidth,
+  engineering, on-call. Budget set annually.
+- **Co-branding is welcome.** A "Verified via Amity" badge on every
+  Brother-owned listing, linking back to Amity, is something we'd
+  encourage — it's recognition of where verification actually comes
+  from.
 
-Happy to draft numbers once the technical integration shape is agreed.
+If at any future point the economics change (for example, if scale
+forces a sustainability model beyond what Siege can absorb), any shift
+would be discussed openly with Amity and with participating Grand
+Lodges first, before any user-facing change.
 
 ---
 
@@ -292,14 +347,17 @@ In order of importance:
 | Phase | Target | Depends on Amity |
 |---|---|---|
 | Model + schema finalized | 2–3 weeks | No |
-| Registry v1 public beta, no Amity, mainstream US only | ~6 weeks | No |
+| Landing page + infrastructure + admin curation tools | ~6 weeks | No |
 | Amity OAuth integration in staging | +2 weeks after sandbox access | **Yes** |
-| Amity-powered launch, US + UK | +4 weeks after staging works | **Yes** |
+| Closed beta with a small cohort of verified Brethren, US + UK | +4 weeks after staging works | **Yes** |
+| Public (authenticated) launch, US + UK | after beta feedback absorbed | **Yes** |
 | PHA + Grand Orient coverage | +4 weeks | Soft yes (jurisdiction ids) |
 | Global expansion | 2026 Q3–Q4 | Soft yes |
 
-We can ship a non-Amity v1. We'd rather not. The integration is what
-turns this from a directory into a trust layer.
+**Amity is now a hard dependency, not a "nice to have."** Because the
+registry is entirely behind verified-Brother authentication, there is
+no shippable v1 without an identity partner. We are betting on Amity.
+We would rather delay launch than ship without verification.
 
 ---
 
@@ -308,17 +366,23 @@ turns this from a directory into a trust layer.
 1. Does Amity have a public OAuth / API program today, or would this be
    the first external integration?
 2. If it's the first, are you open to it, and on what timeline?
-3. What's your preferred scope taxonomy — are we close in §5.2?
-4. Stable jurisdiction / lodge ids: do they exist and are they exposed?
-5. Is there a membership-status webhook we can subscribe to, or should
-   we plan around polling?
-6. Any scopes or data classes you'd want to keep explicitly **off**
+3. Given that **Amity becomes the sole identity gate** for a free
+   public service to the Craft, are you comfortable with that level of
+   dependency on your side? We want to be upfront about the stakes.
+4. What's your preferred scope taxonomy — are we close in §5.2?
+5. Stable jurisdiction / lodge ids: do they exist and are they exposed?
+6. Is there a membership-status webhook we can subscribe to, or should
+   we plan around polling? (Given the trust model, this matters more
+   than in a typical integration.)
+7. Any scopes or data classes you'd want to keep explicitly **off**
    limits? We'd rather know up front than discover it in review.
-7. Is there interest in an `Amity for Business` surface — i.e. would
+8. Is there interest in an `Amity for Business` surface — i.e. would
    Amity want to expose "this Brother owns a registered business" back
    into the Amity UX via a write-back API?
-8. What does a commercial arrangement look like from your side? We can
-   work backwards from your preferred model.
+9. Because the registry is non-profit and entirely Siege-funded, there
+   is no commercial ask on our side. Is there a non-commercial shape
+   (co-branding, MOU, joint statement to Grand Lodges) that would be
+   useful to Amity?
 
 ---
 
